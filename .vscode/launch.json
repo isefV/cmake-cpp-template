@@ -1,0 +1,39 @@
+{
+    // The programs come from the Debug static build with tests and apps: run
+    // "CMake: ctest" > Debug > static library first; folder
+    // build/<mylib.toolchain>-Debug-static.
+    // The entries use the MSVC debugger (cppvsdbg); for GDB (gcc on Windows,
+    // or Linux) use "type": "cppdbg", "MIMode": "gdb" (no ".exe" on Linux), map
+    // "/mylib" instead of "\mylib".
+    //
+    // mylib's debug info names its sources \mylib\src\... (the same on every
+    // PC); "sourceFileMap" points that root at the folder holding them: this
+    // checkout, or an installed Debug package (it ships src/).
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "App: mylib_app",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/${config:mylib.toolchain}-Debug-static/bin/mylib_app.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/${config:mylib.toolchain}-Debug-static/bin",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Tests: mylib_tests",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/${config:mylib.toolchain}-Debug-static/bin/mylib_tests.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/${config:mylib.toolchain}-Debug-static/bin",
+            "environment": [],
+            "console": "integratedTerminal"
+        }
+    ]
+}
