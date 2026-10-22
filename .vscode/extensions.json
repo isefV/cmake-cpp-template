@@ -1,0 +1,8 @@
+{
+    // Offered when the folder is opened: C/C++ (IntelliSense, debugger) and
+    // Command Variable (the tasks read their choices from build.json with it).
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "rioj7.command-variable"
+    ]
+}

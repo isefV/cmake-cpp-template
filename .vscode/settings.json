@@ -8,13 +8,36 @@
         "extern": false
     },
 
-    // Compiler for the CMake tasks (tasks.json): "msvc", "gcc" or "clang",
-    // one of the files in .vscode/cmake/. Also part of the build and install
-    // folder names.
-    "mylib.toolchain": "msvc",
-
-    // The build is driven by the CMake tasks; CMake Tools, if installed,
-    // doesn't configure on its own.
+    // The build is driven by the CMake tasks (tasks.json, build.json); CMake
+    // Tools, if installed, doesn't configure on its own.
     "cmake.useCMakePresets": "never",
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "cmake.configureOnEdit": false,
+    "cmake.automaticReconfigure": false,
+
+    // IntelliSense (C/C++ extension): the compile commands of the build
+    // folder built last (build/current; every target, with its include paths
+    // and defines), and these include paths for any other file: the
+    // project's, and those of the libraries in extern/ (Boost: one include/
+    // per library, so its whole libs/ is searched, "/**").
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/current/compile_commands.json",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/src",
+        "${workspaceFolder}/extern/armadillo/include",
+        "${workspaceFolder}/extern/boost/libs/**",
+        "${workspaceFolder}/extern/cppzmq",
+        "${workspaceFolder}/extern/glfw/include",
+        "${workspaceFolder}/extern/googletest/googlemock/include",
+        "${workspaceFolder}/extern/googletest/googletest/include",
+        "${workspaceFolder}/extern/imgui",
+        "${workspaceFolder}/extern/imgui/backends",
+        "${workspaceFolder}/extern/implot",
+        "${workspaceFolder}/extern/libzmq/include",
+        "${workspaceFolder}/extern/nlohmann_json/include",
+        "${workspaceFolder}/extern/raylib/src",
+        "${workspaceFolder}/extern/sml/include",
+        "${workspaceFolder}/extern/taskflow"
+    ],
+    "C_Cpp.default.cppStandard": "c++20"
 }

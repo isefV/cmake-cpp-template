@@ -1,22 +1,22 @@
 {
-    // mylib tasks: "Terminal > Run Task..." (Ctrl+Shift+B = CMake: build).
-    // Each task is a short chain of plain cmake / ctest commands and asks:
+    // CMake tasks for any CMake project: "Terminal > Run Task..." (Ctrl+Shift+B
+    // = CMake: build). Plain cmake command lines; the choices come from
+    // .vscode/build.json (targets, build types, kits, linkages, each with its
+    // default first), read by the Command Variable extension
+    // (rioj7.command-variable, see extensions.json).
     //
-    //   Debug | Release  >  static library | shared library
-    //
-    // Folders: build/<mylib.toolchain>-<Debug|Release>-<static|shared> (programs
-    // in its bin/), packages in install/<mylib.toolchain>/<static|shared>.
-    // The compiler comes from "mylib.toolchain" in settings.json; the files in
-    // .vscode/cmake/ turn the choices into CMake settings (-C <file>).
-    //
-    // Every build first runs the configure step: it creates the folder the
-    // first time and takes a few seconds afterwards.
+    //   CMake: build    target > build type > kit > linkage: configure
+    //                   build/<kit>-<build type>-<linkage>, build the target,
+    //                   point build/current at that folder
+    //   CMake: clean    build type > kit > linkage: delete that build folder
+    //   CMake: install  build type > kit > linkage: build build.json's
+    //                   install target, install to install/<kit>-<linkage>
     //
     // Windows: the tasks run in PowerShell, which first loads the Visual
-    // Studio developer environment (compiler, CMake and Ninja), so no
-    // Developer Command Prompt is needed. A failing step stops the chain
-    // (the cmake function below; Windows PowerShell has no "&&").
-    // Linux: bash -e, which also stops at the first failing step.
+    // Studio developer environment (cl, Ninja), so no Developer Command Prompt
+    // is needed. A failing step stops the chain (the cmake function below;
+    // Windows PowerShell has no "&&"). Linux: bash -e, which also stops at the
+    // first failing step.
     "version": "2.0.0",
     "windows": {
         "options": {
@@ -33,8 +33,7 @@
                     "Enter-VsDevShell -VsInstallPath $vs -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64' | Out-Null;",
                     "function cmake { & (Get-Command cmake -CommandType Application)[0].Source @args; if ($LASTEXITCODE) { exit $LASTEXITCODE } };"
                 ]
-            },
-            "env": { "CMAKE_GENERATOR": "Ninja" }
+            }
         }
     },
     "linux": {
@@ -45,68 +44,137 @@
     },
     "tasks": [
         {
-            "label": "CMake: configure",
-            "detail": "Configure the build folder from scratch (new CMake cache)",
-            "type": "shell",
-            "command": "cmake -E rm -f build/${config:mylib.toolchain}-${input:config}-${input:linkage}/CMakeCache.txt; cmake -S . -B build/${config:mylib.toolchain}-${input:config}-${input:linkage} -C .vscode/cmake/${config:mylib.toolchain}.cmake -C .vscode/cmake/${input:linkage}.cmake -DCMAKE_BUILD_TYPE=${input:config}",
-            "problemMatcher": []
-        },
-        {
             "label": "CMake: build",
-            "detail": "Configure, then build the library",
+            "detail": "Configure and build a target (build.json: target, build type, kit, linkage)",
             "type": "shell",
-            "command": "cmake -S . -B build/${config:mylib.toolchain}-${input:config}-${input:linkage} -C .vscode/cmake/${config:mylib.toolchain}.cmake -C .vscode/cmake/${input:linkage}.cmake -DCMAKE_BUILD_TYPE=${input:config}; cmake --build build/${config:mylib.toolchain}-${input:config}-${input:linkage} --config ${input:config} --target mylib",
+            "windows": {
+                "command": "echo '${input:target} | ${input:buildType} | ${input:kit} | ${input:linkage}'; cmake -S . -B build/${input:kit}-${input:buildType}-${input:linkage} -DCMAKE_BUILD_TYPE=${input:buildType} ${input:kitCMake} ${input:linkageCMake} ${input:targetCMake}; cmake --build build/${input:kit}-${input:buildType}-${input:linkage} --config ${input:buildType} ${input:targetBuild}; cmd /c 'rmdir build\\current 2>nul & mklink /J build\\current build\\${input:kit}-${input:buildType}-${input:linkage} >nul'"
+            },
+            "command": "echo '${input:target} | ${input:buildType} | ${input:kit} | ${input:linkage}'; cmake -S . -B build/${input:kit}-${input:buildType}-${input:linkage} -DCMAKE_BUILD_TYPE=${input:buildType} ${input:kitCMake} ${input:linkageCMake} ${input:targetCMake}; cmake --build build/${input:kit}-${input:buildType}-${input:linkage} --config ${input:buildType} ${input:targetBuild}; ln -sfn ${input:kit}-${input:buildType}-${input:linkage} build/current",
             "group": { "kind": "build", "isDefault": true },
             "problemMatcher": [ "$msCompile", "$gcc" ]
         },
         {
-            "label": "CMake: rebuild",
-            "detail": "Configure, clean, then build the library again",
-            "type": "shell",
-            "command": "cmake -S . -B build/${config:mylib.toolchain}-${input:config}-${input:linkage} -C .vscode/cmake/${config:mylib.toolchain}.cmake -C .vscode/cmake/${input:linkage}.cmake -DCMAKE_BUILD_TYPE=${input:config}; cmake --build build/${config:mylib.toolchain}-${input:config}-${input:linkage} --config ${input:config} --target mylib --clean-first",
-            "group": "build",
-            "problemMatcher": [ "$msCompile", "$gcc" ]
-        },
-        {
             "label": "CMake: clean",
-            "detail": "Delete the build outputs, keep the configuration",
+            "detail": "Delete a build folder (build.json: build type, kit, linkage)",
             "type": "shell",
-            "command": "cmake --build build/${config:mylib.toolchain}-${input:config}-${input:linkage} --config ${input:config} --target clean",
+            "command": "echo '${input:buildType} | ${input:kit} | ${input:linkage}'; cmake -E rm -rf build/${input:kit}-${input:buildType}-${input:linkage}",
             "problemMatcher": []
         },
         {
             "label": "CMake: install",
-            "detail": "Build the library and install it to install/<toolchain>/<linkage>",
+            "detail": "Build the library and install it (build.json: build type, kit, linkage; install target)",
             "type": "shell",
-            "command": "cmake -S . -B build/${config:mylib.toolchain}-${input:config}-${input:linkage} -C .vscode/cmake/${config:mylib.toolchain}.cmake -C .vscode/cmake/${input:linkage}.cmake -DCMAKE_BUILD_TYPE=${input:config}; cmake --build build/${config:mylib.toolchain}-${input:config}-${input:linkage} --config ${input:config} --target mylib; cmake --install build/${config:mylib.toolchain}-${input:config}-${input:linkage} --config ${input:config} --prefix install/${config:mylib.toolchain}/${input:linkage}",
-            "problemMatcher": [ "$msCompile", "$gcc" ]
-        },
-        {
-            "label": "CMake: ctest",
-            "detail": "Build the library, tests and apps, and run all CTest tests",
-            "type": "shell",
-            "command": "cmake -S . -B build/${config:mylib.toolchain}-${input:config}-${input:linkage} -C .vscode/cmake/${config:mylib.toolchain}.cmake -C .vscode/cmake/${input:linkage}.cmake -DCMAKE_BUILD_TYPE=${input:config}; cmake --build build/${config:mylib.toolchain}-${input:config}-${input:linkage} --config ${input:config}; ctest --test-dir build/${config:mylib.toolchain}-${input:config}-${input:linkage} -C ${input:config} --output-on-failure --timeout 300",
-            "group": "test",
+            "command": "echo '${input:buildType} | ${input:kit} | ${input:linkage}'; cmake -S . -B build/${input:kit}-${input:buildType}-${input:linkage} -DCMAKE_BUILD_TYPE=${input:buildType} ${input:kitCMake} ${input:linkageCMake}; cmake --build build/${input:kit}-${input:buildType}-${input:linkage} --config ${input:buildType} --target ${input:installTarget}; cmake --install build/${input:kit}-${input:buildType}-${input:linkage} --config ${input:buildType} --prefix install/${input:kit}-${input:linkage}",
             "problemMatcher": [ "$msCompile", "$gcc" ]
         }
     ],
     "inputs": [
+        // The four questions: a pick list from a build.json section, its
+        // default first. A pick also remembers the item's cmake arguments.
         {
-            "id": "config",
-            "type": "pickString",
-            "description": "Configuration",
-            "default": "Debug",
-            "options": [ "Debug", "Release" ]
+            "id": "target",
+            "type": "command",
+            "command": "extension.commandvariable.pickStringRemember",
+            "args": {
+                "description": "Target",
+                "key": "target",
+                "fileName": "${workspaceFolder}/.vscode/build.json",
+                "fileFormat": "json",
+                "jsonOption": {
+                    "label": "content.targets.items[__itemIdx__].name",
+                    "description": "content.targets.items[__itemIdx__].description || ''",
+                    "value": {
+                        "target": "content.targets.items[__itemIdx__].name",
+                        "targetCMake": "content.targets.items[__itemIdx__].cmake || ''",
+                        "targetBuild": "content.targets.items[__itemIdx__].name === 'all' ? '' : '--target ' + content.targets.items[__itemIdx__].name"
+                    }
+                },
+                "addLabelToTop": "${fileContent:default}",
+                "fileContent": {
+                    "default": { "fileName": "${workspaceFolder}/.vscode/build.json", "json": "content.targets.default" }
+                }
+            }
+        },
+        {
+            "id": "buildType",
+            "type": "command",
+            "command": "extension.commandvariable.pickStringRemember",
+            "args": {
+                "description": "Build type",
+                "key": "buildType",
+                "fileName": "${workspaceFolder}/.vscode/build.json",
+                "fileFormat": "json",
+                "jsonOption": {
+                    "label": "content.buildTypes.items[__itemIdx__].name",
+                    "description": "content.buildTypes.items[__itemIdx__].description || ''",
+                    "value": "content.buildTypes.items[__itemIdx__].name"
+                },
+                "addLabelToTop": "${fileContent:default}",
+                "fileContent": {
+                    "default": { "fileName": "${workspaceFolder}/.vscode/build.json", "json": "content.buildTypes.default" }
+                }
+            }
+        },
+        {
+            "id": "kit",
+            "type": "command",
+            "command": "extension.commandvariable.pickStringRemember",
+            "args": {
+                "description": "Kit (compiler)",
+                "key": "kit",
+                "fileName": "${workspaceFolder}/.vscode/build.json",
+                "fileFormat": "json",
+                "jsonOption": {
+                    "label": "content.kits.items[__itemIdx__].name",
+                    "description": "content.kits.items[__itemIdx__].description || ''",
+                    "value": {
+                        "kit": "content.kits.items[__itemIdx__].name",
+                        "kitCMake": "content.kits.items[__itemIdx__].cmake || ''"
+                    }
+                },
+                "addLabelToTop": "${fileContent:default}",
+                "fileContent": {
+                    "default": { "fileName": "${workspaceFolder}/.vscode/build.json", "json": "content.kits.default" }
+                }
+            }
         },
         {
             "id": "linkage",
-            "type": "pickString",
-            "description": "Library type",
-            "default": "static",
-            "options": [
-                { "label": "static library", "value": "static" },
-                { "label": "shared library", "value": "shared" }
-            ]
+            "type": "command",
+            "command": "extension.commandvariable.pickStringRemember",
+            "args": {
+                "description": "Linkage",
+                "key": "linkage",
+                "fileName": "${workspaceFolder}/.vscode/build.json",
+                "fileFormat": "json",
+                "jsonOption": {
+                    "label": "content.linkages.items[__itemIdx__].name",
+                    "description": "content.linkages.items[__itemIdx__].description || ''",
+                    "value": {
+                        "linkage": "content.linkages.items[__itemIdx__].name",
+                        "linkageCMake": "content.linkages.items[__itemIdx__].cmake || ''"
+                    }
+                },
+                "addLabelToTop": "${fileContent:default}",
+                "fileContent": {
+                    "default": { "fileName": "${workspaceFolder}/.vscode/build.json", "json": "content.linkages.default" }
+                }
+            }
+        },
+
+        // The cmake arguments of the picked items.
+        { "id": "targetCMake", "type": "command", "command": "extension.commandvariable.remember", "args": { "key": "targetCMake" } },
+        { "id": "targetBuild", "type": "command", "command": "extension.commandvariable.remember", "args": { "key": "targetBuild" } },
+        { "id": "kitCMake", "type": "command", "command": "extension.commandvariable.remember", "args": { "key": "kitCMake" } },
+        { "id": "linkageCMake", "type": "command", "command": "extension.commandvariable.remember", "args": { "key": "linkageCMake" } },
+
+        // build.json's install target.
+        {
+            "id": "installTarget",
+            "type": "command",
+            "command": "extension.commandvariable.file.content",
+            "args": { "fileName": "${workspaceFolder}/.vscode/build.json", "json": "content.install.target" }
         }
     ]
 }

@@ -1,0 +1,64 @@
+// The choices of the CMake tasks in tasks.json: "Terminal > Run Task...".
+//
+// Each section is a list of items and a "default" (offered first). An item's
+// "cmake" is added to the configure command line. Edit the lists freely; the
+// tasks read this file every time they run (with the Command Variable
+// extension, rioj7.command-variable).
+//
+// Folders: build/<kit>-<build type>-<linkage>; build/current points at the
+// one built last (launch.json, IntelliSense). Install: install/<kit>-<linkage>.
+{
+    // What "CMake: build" builds. "all" is everything the configuration builds.
+    "targets": {
+        "default": "all",
+        "items": [
+            { "name": "all", "description": "everything the configuration builds" },
+            { "name": "mylib", "description": "the library" },
+            { "name": "mylib_tests", "description": "tests (GoogleTest)" },
+            { "name": "mylib_app", "description": "apps/app" },
+            { "name": "mylib_boost", "description": "apps/boost", "cmake": "-DMYLIB_BUILD_APP_BOOST=ON" },
+            { "name": "mylib_nlohmann_json", "description": "apps/nlohmann_json", "cmake": "-DMYLIB_BUILD_APP_NLOHMANN_JSON=ON" },
+            { "name": "mylib_sml", "description": "apps/sml", "cmake": "-DMYLIB_BUILD_APP_SML=ON" },
+            { "name": "mylib_taskflow", "description": "apps/taskflow", "cmake": "-DMYLIB_BUILD_APP_TASKFLOW=ON" },
+            { "name": "mylib_raylib", "description": "apps/raylib", "cmake": "-DMYLIB_BUILD_APP_RAYLIB=ON" },
+            { "name": "mylib_zeromq", "description": "apps/zeromq", "cmake": "-DMYLIB_BUILD_APP_ZEROMQ=ON" },
+            { "name": "mylib_cppzmq", "description": "apps/cppzmq", "cmake": "-DMYLIB_BUILD_APP_CPPZMQ=ON" },
+            { "name": "mylib_armadillo", "description": "apps/armadillo", "cmake": "-DMYLIB_BUILD_APP_ARMADILLO=ON" },
+            { "name": "mylib_imgui", "description": "apps/imgui", "cmake": "-DMYLIB_BUILD_APP_IMGUI=ON" },
+            { "name": "mylib_implot", "description": "apps/implot", "cmake": "-DMYLIB_BUILD_APP_IMPLOT=ON" },
+            { "name": "mylib_googletest", "description": "apps/googletest", "cmake": "-DMYLIB_BUILD_APP_GOOGLETEST=ON" }
+        ]
+    },
+
+    "buildTypes": {
+        "default": "Debug",
+        "items": [
+            { "name": "Debug", "description": "no optimization, debug info" },
+            { "name": "Release", "description": "optimized" }
+        ]
+    },
+
+    // Compilers. On Windows the tasks load the Visual Studio environment first,
+    // so cl (and its Ninja) are found; gcc and clang come from the PATH.
+    "kits": {
+        "default": "msvc",
+        "items": [
+            { "name": "msvc", "description": "MSVC, Ninja", "cmake": "-G Ninja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl" },
+            { "name": "gcc", "description": "GCC, Ninja", "cmake": "-G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++" },
+            { "name": "clang", "description": "Clang, Ninja", "cmake": "-G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++" }
+        ]
+    },
+
+    "linkages": {
+        "default": "static",
+        "items": [
+            { "name": "static", "description": "static libraries", "cmake": "-DBUILD_SHARED_LIBS=OFF" },
+            { "name": "shared", "description": "shared libraries (DLL / .so)", "cmake": "-DBUILD_SHARED_LIBS=ON" }
+        ]
+    },
+
+    // "CMake: install" builds this target, then installs.
+    "install": {
+        "target": "mylib"
+    }
+}

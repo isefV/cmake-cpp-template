@@ -1,7 +1,9 @@
 {
-    // The programs come from the Debug static build with tests and apps: run
-    // "CMake: ctest" > Debug > static library first; folder
-    // build/<mylib.toolchain>-Debug-static.
+    // The programs of the build folder built last: build/current, which
+    // "CMake: build" points at build/<kit>-<build type>-<linkage>. Build the
+    // program's target first (an app with its MYLIB_BUILD_APP_* option, which
+    // build.json's target list sets).
+    //
     // The entries use the MSVC debugger (cppvsdbg); for GDB (gcc on Windows,
     // or Linux) use "type": "cppdbg", "MIMode": "gdb" (no ".exe" on Linux), map
     // "/mylib" instead of "\mylib".
@@ -16,11 +18,9 @@
             "type": "cppvsdbg",
             "request": "launch",
             "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
-            "program": "${workspaceFolder}/build/${config:mylib.toolchain}-Debug-static/bin/mylib_app.exe",
+            "program": "${workspaceFolder}/build/current/bin/mylib_app.exe",
             "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/build/${config:mylib.toolchain}-Debug-static/bin",
-            "environment": [],
+            "cwd": "${workspaceFolder}/build/current/bin",
             "console": "integratedTerminal"
         },
         {
@@ -28,11 +28,119 @@
             "type": "cppvsdbg",
             "request": "launch",
             "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
-            "program": "${workspaceFolder}/build/${config:mylib.toolchain}-Debug-static/bin/mylib_tests.exe",
+            "program": "${workspaceFolder}/build/current/bin/mylib_tests.exe",
             "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/build/${config:mylib.toolchain}-Debug-static/bin",
-            "environment": [],
+            "cwd": "${workspaceFolder}/build/current/bin",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "App: mylib_boost",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/current/bin/mylib_boost.exe",
+            "args": [ "--from", "1", "--to", "10" ],
+            "cwd": "${workspaceFolder}/build/current/bin",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "App: mylib_nlohmann_json",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/current/bin/mylib_nlohmann_json.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/build/current/bin",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "App: mylib_sml",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/current/bin/mylib_sml.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/build/current/bin",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "App: mylib_taskflow",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/current/bin/mylib_taskflow.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/build/current/bin",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "App: mylib_raylib",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/current/bin/mylib_raylib.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/build/current/bin",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "App: mylib_zeromq",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/current/bin/mylib_zeromq.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/build/current/bin",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "App: mylib_cppzmq",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/current/bin/mylib_cppzmq.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/build/current/bin",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "App: mylib_armadillo",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/current/bin/mylib_armadillo.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/build/current/bin",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "App: mylib_imgui",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/current/bin/mylib_imgui.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/build/current/bin",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "App: mylib_implot",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/current/bin/mylib_implot.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/build/current/bin",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Tests: mylib_googletest",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "sourceFileMap": { "\\mylib": "${workspaceFolder}" },
+            "program": "${workspaceFolder}/build/current/bin/mylib_googletest.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/build/current/bin",
             "console": "integratedTerminal"
         }
     ]
