@@ -19,11 +19,26 @@ project(
 # alone.
 # -----------------------------------------------------------------------------
 
-option(MYLIB_BUILD_SHARED "Build mylib as a shared library (default: static)"     ${BUILD_SHARED_LIBS})
-option(MYLIB_BUILD_TESTS  "Build the tests and register them with CTest"         ${PROJECT_IS_TOP_LEVEL})
-option(MYLIB_BUILD_APPS   "Build the example programs in apps/"                  ${PROJECT_IS_TOP_LEVEL})
-option(MYLIB_BUILD_DOCS   "Build the API documentation with Doxygen (target docs)" OFF)
-option(MYLIB_INSTALL      "Generate install rules and the mylib CMake package"    ${PROJECT_IS_TOP_LEVEL})
+option(
+    MYLIB_BUILD_SHARED 
+    "Build mylib as a shared library (default: static)"
+    ${BUILD_SHARED_LIBS})
+option(
+    MYLIB_BUILD_TESTS  
+    "Build the tests and register them with CTest"
+    ${PROJECT_IS_TOP_LEVEL})
+option(
+    MYLIB_BUILD_APPS
+    "Build the example programs in apps/"
+    ${PROJECT_IS_TOP_LEVEL})
+option(
+    MYLIB_BUILD_DOCS
+    "Build the API documentation with Doxygen (target docs)"
+    OFF)
+option(
+    MYLIB_INSTALL
+    "Generate install rules and the mylib CMake package"
+    ${PROJECT_IS_TOP_LEVEL})
 
 # -----------------------------------------------------------------------------
 # C++ configuration and output layout
@@ -54,6 +69,12 @@ endif()
 # -----------------------------------------------------------------------------
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+
+# Optional; the defaults are shown
+# set(BOOST_GIT_REPOSITORY "https://github.com/boostorg/boost.git")
+# set(BOOST_GIT_TAG        "boost-1.92.0")
+# find_package(Boost 1.85 REQUIRED COMPONENTS filesystem program_options)
+# target_link_libraries(my_app PRIVATE Boost::filesystem Boost::program_options)
 
 find_package(Threads REQUIRED)                             # Threads::Threads
 

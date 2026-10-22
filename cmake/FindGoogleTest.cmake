@@ -21,9 +21,12 @@
 #
 #   GOOGLETEST_ROOT_DIR         a GoogleTest you have (see 1.)
 #   GOOGLETEST_GIT_REPOSITORY   default: https://github.com/google/googletest.git
-#   GOOGLETEST_GIT_TAG          tag, branch or commit; default: v1.17.0
+#   GOOGLETEST_GIT_TAG          tag or branch; default: v1.18.0
 #   GOOGLETEST_SOURCE_DIR       where the clone goes;
 #                               default: ../extern/googletest beside this file
+#
+# The repository can be on any git server (a mirror, offline): it is cloned
+# without submodules.
 #
 # Result:
 #
@@ -48,7 +51,7 @@ if(NOT GOOGLETEST_GIT_REPOSITORY)
 endif()
 
 if(NOT GOOGLETEST_GIT_TAG)
-    set(GOOGLETEST_GIT_TAG "v1.17.0")
+    set(GOOGLETEST_GIT_TAG "v1.18.0")
 endif()
 
 if(NOT GOOGLETEST_SOURCE_DIR)
@@ -117,6 +120,7 @@ if(NOT GOOGLETEST_DIR)
         GIT_REPOSITORY "${GOOGLETEST_GIT_REPOSITORY}"
         GIT_TAG "${GOOGLETEST_GIT_TAG}"
         GIT_SHALLOW TRUE
+        GIT_SUBMODULES ""
         SOURCE_DIR "${GOOGLETEST_SOURCE_DIR}"
     )
 
